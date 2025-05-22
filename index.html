@@ -113,7 +113,7 @@
 
   <div class="footer">Ingrese los datos y verá el gráfico actualizándose al instante.</div>
 
-  <!-- Chart.js CDN -->
+  <!-- script -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script>
     const ctx = document.getElementById('populationChart').getContext('2d');
@@ -209,9 +209,9 @@
         return;
       }
 
-      // Insert data maintaining the chronological order by year
+      // Inserte datos cronologicamente
       let insertIndex = years.findIndex(y => y > year);
-      if (insertIndex === -1) { // year is largest, push at end
+      if (insertIndex === -1) { 
         years.push(year);
         populations.push(pop);
       } else {
@@ -219,11 +219,11 @@
         populations.splice(insertIndex, 0, pop);
       }
 
-      // Reset inputs
+      // Reset
       yearInput.value = '';
       populationInput.value = '';
 
-      // Update chart labels and data
+      // Actualización
       populationChart.data.labels = years;
       populationChart.data.datasets[0].data = populations;
       populationChart.update();
