@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Crecimiento Poblacional</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap');
+    body {
+      font-family: 'Montserrat', sans-serif;
+      background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      color: #fff;
+      padding: 20px;
+    }
+    h1 {
+      font-weight: 600;
+      margin-bottom: 10px;
+      text-shadow: 0 2px 6px rgba(0,0,0,0.5);
+    }
+    .input-section {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 20px 30px;
+      border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+      margin-bottom: 30px;
+      width: 100%;
+      max-width: 460px;
+      display: flex;
+      gap: 15px;
+      align-items: center;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    label {
+      font-size: 0.95rem;
+      font-weight: 500;
+      flex-basis: 100%;
+      margin-bottom: 6px;
+    }
+    input[type="number"] {
+      padding: 10px 12px;
+      border-radius: 8px;
+      border: none;
+      outline: none;
+      font-size: 1rem;
+      width: 110px;
+      text-align: center;
+      box-shadow: inset 0 2px 6px rgba(0,0,0,0.2);
+      transition: box-shadow 0.3s ease;
+    }
+    input[type="number"]:focus {
+      box-shadow: inset 0 2px 8px #2575fc;
+    }
+    button {
+      background: #ff6961;
+      border: none;
+      padding: 12px 30px;
+      border-radius: 30px;
+      color: #fff;
+      font-weight: 700;
+      cursor: pointer;
+      font-size: 1.1rem;
+      box-shadow: 0 6px 16px rgba(255,105,97,0.6);
+      transition: background-color 0.3s ease;
+      flex-shrink: 0;
+    }
+    button:hover {
+      background: #ff4a40;
+    }
+    .chart-container {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 15px;
+      padding: 30px;
+      box-shadow: 0 12px 36px rgba(0,0,0,0.18);
+      width: 90%;
+      max-width: 860px;
+    }
+    canvas {
+      display: block;
+      max-width: 100%;
+      height: auto !important;
+    }
+    .footer {
+      margin-top: auto;
+      font-size: 0.85rem;
+      opacity: 0.7;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <h1>Crecimiento Poblacional en Años</h1>
+  <form class="input-section" id="data-form">
+    <div>
+      <label for="year-input">Año</label>
+      <input type="number" id="year-input" min="1800" max="2100" step="1" required placeholder="Ej: 2020" />
+    </div>
+    <div>
+      <label for="population-input">Población</label>
+      <input type="number" id="population-input" min="0" step="any" required placeholder="Ej: 5000000" />
+    </div>
+    <button type="submit">Agregar</button>
+  </form>
+
+  <section class="chart-container">
+    <canvas id="populationChart"></canvas>
+  </section>
+
+  <div class="footer">Ingrese los datos y verá el gráfico actualizándose al instante.</div>
+
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    const ctx = document.getElementById('populationChart').getContext('2d');
+    let years = [];
+    let populations = [];
+
+    const chartConfig = {
+      type: 'line',
+      data: {
+        labels: years,
+        datasets: [{
+          label: 'Población',
+          data: populations,
+          borderColor: '#ff6961',
+          backgroundColor: 'rgba(255,105,97,0.3)',
+          fill: true,
+          tension: 0.4,
+          pointRadius: 5,
+          pointHoverRadius: 7,
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          y: {
+            beginAtZero: true,
+            title: {
+              display: true,
+              text: 'Población',
+              color: '#fff',
+              font: { size: 14, weight: '600' }
+            },
+            grid: {
+              color: 'rgba(255, 255, 255, 0.25)'
+            },
+            ticks: {
+              color: '#fff'
+            }
+          },
+          x: {
+            title: {
+              display: true,
+              text: 'Año',
+              color: '#fff',
+              font: { size: 14, weight: '600' }
+            },
+            grid: {
+              color: 'rgba(255, 255, 255, 0.15)'
+            },
+            ticks: {
+              color: '#fff'
+            }
+          }
+        },
+        plugins: {
+          legend: {
+            labels: {
+              color: '#fff',
+              font: { weight: '700', size: 14 }
+            }
+          },
+          tooltip: {
+            backgroundColor: '#333',
+            titleColor: '#ff6961',
+            bodyColor: '#fff',
+            cornerRadius: 6,
+            padding: 10,
+            displayColors: false,
+            bodyFont: { size: 14 }
+          }
+        }
+      }
+    };
+
+    const populationChart = new Chart(ctx, chartConfig);
+
+    const form = document.getElementById('data-form');
+    const yearInput = document.getElementById('year-input');
+    const populationInput = document.getElementById('population-input');
+
+    form.addEventListener('submit', e => {
+      e.preventDefault();
+      const year = parseInt(yearInput.value);
+      const pop = parseFloat(populationInput.value);
+
+      if (!year || isNaN(pop) || pop < 0) {
+        alert('Por favor, ingrese un año válido y una población válida (número positivo).');
+        return;
+      }
+      if (years.includes(year)) {
+        alert('Ya hay datos para ese año. Por favor ingrese un año diferente.');
+        return;
+      }
+
+      // Insert data maintaining the chronological order by year
+      let insertIndex = years.findIndex(y => y > year);
+      if (insertIndex === -1) { // year is largest, push at end
+        years.push(year);
+        populations.push(pop);
+      } else {
+        years.splice(insertIndex, 0, year);
+        populations.splice(insertIndex, 0, pop);
+      }
+
+      // Reset inputs
+      yearInput.value = '';
+      populationInput.value = '';
+
+      // Update chart labels and data
+      populationChart.data.labels = years;
+      populationChart.data.datasets[0].data = populations;
+      populationChart.update();
+    });
+  </script>
+</body>
+</html>
+
